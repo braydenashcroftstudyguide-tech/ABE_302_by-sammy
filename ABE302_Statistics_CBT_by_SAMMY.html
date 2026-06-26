@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ABE 302 · Statistics CBT — by SAMMY</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --acc:#7c3aed;--acc2:#6d28d9;--acc3:#8b5cf6;
+  --bg:#0c0b14;--surf:#181628;--surf2:#201e32;
+  --brd:#2e2a4a;--text:#ebe9f8;--muted:#5e5c7a;
+  --ok:#22c55e;--err:#ef4444;--warn:#f59e0b;
+}
+body{background:var(--bg);color:var(--text);font-family:'Courier New',monospace;min-height:100vh}
+button{cursor:pointer;font-family:'Courier New',monospace}
+
+/* ─── HOME ─── */
+#home{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.home-wrap{width:100%;max-width:490px}
+.eyebrow{font-size:11px;letter-spacing:6px;color:var(--muted);text-align:center;margin-bottom:10px;text-transform:uppercase}
+.main-title{font-size:46px;font-weight:900;color:#f2f0ff;text-align:center;line-height:1;margin-bottom:6px;letter-spacing:-1px}
+.main-title span{color:var(--acc3)}
+.sub{font-size:12px;color:var(--muted);text-align:center;margin-bottom:34px;letter-spacing:1px}
+.card{background:var(--surf);border-radius:12px;padding:20px 22px;margin-bottom:14px;border:1px solid var(--brd)}
+.card-lbl{font-size:10px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;display:block}
+.chip-row{display:flex;gap:7px;flex-wrap:wrap}
+.chip{flex:1;min-width:52px;padding:9px 4px;border-radius:8px;border:none;font-size:14px;font-weight:700;
+  background:var(--surf2);color:var(--muted);transition:background .13s,color .13s}
+.chip.on{background:var(--acc);color:#fff}
+.chip:hover:not(.on){background:#2a2645;color:var(--text)}
+.start-btn{width:100%;padding:15px;border-radius:10px;border:none;font-size:15px;font-weight:900;letter-spacing:4px;
+  text-transform:uppercase;background:var(--acc);color:#fff;margin-top:6px;transition:background .15s;font-family:'Courier New',monospace}
+.start-btn:hover{background:var(--acc2)}
+.badge{font-size:10px;background:var(--surf2);border:1px solid var(--brd);border-radius:20px;padding:4px 10px;
+  color:var(--muted);text-align:center;margin-top:16px;display:block;letter-spacing:2px}
+.made{text-align:center;margin-top:18px;font-size:11px;color:#2a2645;letter-spacing:2px}
+.made b{color:var(--acc);font-weight:900}
+
+/* ─── QUIZ ─── */
+#quiz{display:none;min-height:100vh}
+.qhdr{background:var(--surf);padding:11px 18px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:20;border-bottom:1px solid var(--brd)}
+.q-done{font-size:12px;color:var(--muted)}
+.timer{font-size:19px;font-weight:900;letter-spacing:3px;transition:color .3s;min-width:70px;text-align:center}
+.sub-btn{background:var(--err);color:#fff;border:none;border-radius:6px;padding:5px 13px;
+  font-size:11px;font-weight:800;font-family:'Courier New',monospace;letter-spacing:1px}
+.prog-bar{height:3px;background:var(--surf)}
+.prog-fill{height:100%;background:var(--acc);transition:width .25s}
+.qbody{max-width:640px;margin:0 auto;padding:22px 18px}
+.qmeta{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.qnum{font-size:11px;color:var(--muted);letter-spacing:2px}
+.flag-btn{border:none;border-radius:6px;padding:4px 11px;font-size:11px;font-weight:800;
+  font-family:'Courier New',monospace;transition:all .15s;background:var(--surf2);color:var(--muted)}
+.flag-btn.flagged{background:var(--warn);color:#000}
+.qtext{font-size:16px;line-height:1.7;margin-bottom:24px;color:#f2f0ff;min-height:52px}
+.opts{display:flex;flex-direction:column;gap:9px;margin-bottom:28px}
+.opt{text-align:left;padding:13px 16px;border-radius:10px;border:2px solid var(--brd);background:var(--surf);
+  color:#b8b4d8;font-size:13.5px;font-family:'Courier New',monospace;display:flex;align-items:flex-start;
+  gap:11px;transition:all .12s;width:100%}
+.opt:hover{border-color:#4a4470;background:var(--surf2)}
+.opt.sel{border-color:var(--acc);background:#2d1b69;color:#c4b5fd}
+.opt-l{font-weight:900;min-width:20px;color:var(--muted);font-size:12px;flex-shrink:0;padding-top:1px}
+.opt.sel .opt-l{color:var(--acc3)}
+.nav-row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.nav-btn{padding:9px 20px;border-radius:8px;border:none;font-family:'Courier New',monospace;font-weight:800;
+  font-size:13px;background:var(--surf2);color:var(--text);transition:all .15s}
+.nav-btn:hover:not(:disabled){background:#2a2645}
+.nav-btn:disabled{background:var(--surf);color:#2e2a4a;cursor:default}
+.grid-wrap{display:flex;gap:3px;flex-wrap:wrap;justify-content:center;flex:1;
+  max-height:86px;overflow-y:auto;padding:2px}
+.gb{width:26px;height:26px;border-radius:5px;border:none;font-size:9px;font-weight:800;
+  font-family:'Courier New',monospace;background:var(--surf);color:#3a3660;transition:all .1s;flex-shrink:0}
+.gb.cur{background:var(--acc);color:#fff}
+.gb.ans{background:#166534;color:#86efac}
+.gb.flg{background:var(--warn);color:#000}
+.gb:hover{filter:brightness(1.2)}
+
+/* ─── RESULTS ─── */
+#results{display:none;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.res-wrap{width:100%;max-width:460px}
+.big-pct{font-size:80px;font-weight:900;text-align:center;line-height:1;letter-spacing:-2px}
+.grade{font-size:18px;font-weight:900;letter-spacing:5px;text-align:center;margin-top:4px;margin-bottom:26px}
+.srow{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--brd)}
+.srow:last-child{border:none}
+.slbl{color:var(--muted);font-size:12px;letter-spacing:1px}
+.sval{font-weight:900;font-size:19px}
+.res-btn{width:100%;padding:13px;border-radius:10px;border:none;font-size:14px;font-weight:800;
+  font-family:'Courier New',monospace;margin-top:9px;cursor:pointer;letter-spacing:2px;transition:background .15s}
+
+/* ─── REVIEW ─── */
+#review{display:none;min-height:100vh}
+.rvhdr{background:var(--surf);padding:11px 18px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:20;border-bottom:1px solid var(--brd)}
+.rv-lbl{font-size:10px;color:var(--muted);letter-spacing:3px}
+.verdict{font-size:13px;font-weight:900;letter-spacing:1px}
+.back-btn{background:var(--surf2);color:var(--text);border:none;border-radius:6px;padding:5px 13px;
+  font-size:11px;font-weight:700;font-family:'Courier New',monospace;cursor:pointer}
+.rvbody{max-width:640px;margin:0 auto;padding:22px 18px}
+.opt.cor{border-color:var(--ok);background:#14532d;color:#86efac}
+.opt.wrg{border-color:var(--err);background:#450a0a;color:#fca5a5}
+.opt.cor .opt-l{color:var(--ok)}
+.opt.wrg .opt-l{color:var(--err)}
+.opt-ico{font-weight:900;font-size:11px;margin-left:auto;flex-shrink:0;padding-top:1px}
+.rv-note{margin-top:16px;padding:12px 15px;border-radius:8px;border:1px solid var(--brd);
+  background:var(--surf);font-size:12px;color:var(--muted);line-height:1.6}
+.rv-note b{color:var(--acc3)}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--surf)}
+::-webkit-scrollbar-thumb{background:var(--brd);border-radius:2px}
+</style>
+</head>
+<body>
+
+<!-- ═══ HOME ═══ -->
+<div id="home">
+  <div class="home-wrap">
+    <div class="eyebrow">ABE 302 · Engineering Statistics</div>
+    <div class="main-title">STATS<span>CBT</span></div>
+    <div class="sub">120 questions &nbsp;·&nbsp; timed &nbsp;·&nbsp; scored &nbsp;·&nbsp; reviewed</div>
+
+    <div class="card">
+      <span class="card-lbl">Number of Questions</span>
+      <div class="chip-row" id="qChips"></div>
+    </div>
+
+    <div class="card">
+      <span class="card-lbl">Time Limit (minutes)</span>
+      <div class="chip-row" id="tChips"></div>
+    </div>
+
+    <div class="card">
+      <span class="card-lbl">Mode</span>
+      <div class="chip-row">
+        <button class="chip on" id="mRand" onclick="setMode('random')">🔀 Random</button>
+        <button class="chip"   id="mOrd"  onclick="setMode('order')">📋 In Order</button>
+      </div>
+    </div>
+
+    <div class="card" id="batchCard" style="display:none">
+      <span class="card-lbl">Batch (start from)</span>
+      <div id="batchChips" class="chip-row" style="flex-wrap:wrap;gap:6px;max-height:160px;overflow-y:auto"></div>
+    </div>
+
+    <button class="start-btn" onclick="startQuiz()">Start Exam →</button>
+    <span class="badge">Pass threshold: 50% &nbsp;·&nbsp; Topics: Probability · Distributions · Inference · Regression · Hypothesis</span>
+    <div class="made">Made by <b>SAMMY</b></div>
+  </div>
+</div>
+
+<!-- ═══ QUIZ ═══ -->
+<div id="quiz">
+  <div class="qhdr">
+    <div class="q-done" id="qDone">0/0 done</div>
+    <div class="timer" id="timer">00:00</div>
+    <button class="sub-btn" onclick="confirmSubmit()">SUBMIT</button>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+
+  <div class="qbody">
+    <div class="qmeta">
+      <div class="qnum" id="qNum">Q 1 OF 0</div>
+      <button class="flag-btn" id="flagBtn" onclick="toggleFlag()">⚐ FLAG</button>
+    </div>
+    <div class="qtext" id="qText"></div>
+    <div class="opts"  id="opts"></div>
+    <div class="nav-row">
+      <button class="nav-btn" id="prevBtn" onclick="nav(-1)">← Prev</button>
+      <div class="grid-wrap" id="grid"></div>
+      <button class="nav-btn" id="nextBtn" onclick="nav(1)">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ RESULTS ═══ -->
+<div id="results">
+  <div class="res-wrap">
+    <div class="big-pct" id="bigPct">0%</div>
+    <div class="grade"   id="gradeLabel">—</div>
+    <div class="card" id="statsCard"></div>
+    <button class="res-btn" style="background:var(--surf2);color:var(--text)" onclick="goReview()">Review Answers</button>
+    <button class="res-btn" style="background:var(--acc);color:#fff" onclick="goHome()">New Exam →</button>
+    <div class="made" style="margin-top:18px">Made by <b>SAMMY</b></div>
+  </div>
+</div>
+
+<!-- ═══ REVIEW ═══ -->
+<div id="review">
+  <div class="rvhdr">
+    <div class="rv-lbl">REVIEW MODE</div>
+    <div class="verdict" id="rvVerdict"></div>
+    <button class="back-btn" onclick="show('results')">← Results</button>
+  </div>
+  <div class="rvbody">
+    <div class="qmeta">
+      <div class="qnum" id="rNum">Q 1 OF 0</div>
+      <div style="font-size:11px;color:var(--muted)" id="rTopic"></div>
+    </div>
+    <div class="qtext" id="rText"></div>
+    <div class="opts"  id="rOpts"></div>
+    <div class="rv-note" id="rvNote"></div>
+    <div class="nav-row" style="margin-top:16px">
+      <button class="nav-btn" id="rPrev" onclick="rNav(-1)">← Prev</button>
+      <div class="grid-wrap" id="rGrid"></div>
+      <button class="nav-btn" id="rNext" onclick="rNav(1)">Next →</button>
+    </div>
+    <div class="made" style="margin-top:28px">Made by <b>SAMMY</b></div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════
+   QUESTION BANK  —  120 questions
+   a: correct option letter  A=idx0  B=idx1  C=idx2  D=idx3
+   tp: topic tag shown in review
+════════════════════════════════════════════ */
+const Q=[
+// ── PROBABILITY BASICS ──────────────────────────────────────
+{t:"Probability is defined as the measure of the likelihood that an event will occur in a:",
+ o:["Prescribed trial or experiment","Statistical table","Mathematical proof","Fixed sequence"],a:"A",tp:"Probability Basics"},
+{t:"P(A) + P(Not A) always equals:",
+ o:["0","1","0.5","2"],a:"B",tp:"Probability Basics"},
+{t:"The formula for P(success), given x successes out of N trials, is:",
+ o:["N/x","(N-x)/N","x/N","x/(N-x)"],a:"C",tp:"Probability Basics"},
+{t:"P(failure) = (N−x)/N. If N=20 and x=8, P(failure) equals:",
+ o:["0.4","0.8","0.2","0.6"],a:"D",tp:"Probability Basics"},
+{t:"The two main perspectives for determining probability are:",
+ o:["Empirical and Classical","Theoretical and Applied","Binomial and Normal","Random and Systematic"],a:"A",tp:"Probability Basics"},
+{t:"Empirical (experimental) probability is based on:",
+ o:["Mathematical formulas","Previous known results","Population census data","Normal distribution tables"],a:"B",tp:"Probability Basics"},
+{t:"Classical probability P(A) is defined as:",
+ o:["Total outcomes / Favorable outcomes","Number of trials / probability","Favorable outcomes / Total possible outcomes","Mean × standard deviation"],a:"C",tp:"Probability Basics"},
+{t:"Expectation is the product of the number of trials and:",
+ o:["Variance of event A","The standard deviation","The population mean","The probability that event A will occur"],a:"D",tp:"Probability Basics"},
+// ── PROBABILITY RULES ────────────────────────────────────────
+{t:"Mutually exclusive events are events which:",
+ o:["Cannot occur together","Can always occur simultaneously","Have equal probabilities","Are always independent"],a:"A",tp:"Probability Rules"},
+{t:"Mutually non-exclusive events are those which:",
+ o:["Cannot occur at the same time","Happen simultaneously (e.g. two dice cast)","Have probabilities summing to 1","Are always independent"],a:"B",tp:"Probability Rules"},
+{t:"For mutually exclusive events A and B, P(A or B) =",
+ o:["P(A) × P(B)","P(A) − P(B)","P(A) + P(B)","P(A) / P(B)"],a:"C",tp:"Probability Rules"},
+{t:"In probability theory, 'OR' represents which arithmetic operation?",
+ o:["Multiplication","Division","Subtraction","Addition"],a:"D",tp:"Probability Rules"},
+{t:"In probability theory, 'AND / BUT' represents which operation?",
+ o:["Multiplication","Addition","Subtraction","Division"],a:"A",tp:"Probability Rules"},
+{t:"Events are independent when the occurrence of one event:",
+ o:["Always causes the other","Does not affect the probability of the second event","Always prevents the other","Doubles the other's probability"],a:"B",tp:"Probability Rules"},
+{t:"Events are dependent when one event:",
+ o:["Has no effect on others","Is always more likely","Affects the probability of occurrence of a second event","Eliminates the other"],a:"C",tp:"Probability Rules"},
+{t:"In probability, independent events are associated with:",
+ o:["Non-replacement","Conditional probability only","Dependent sampling","Replacement of events"],a:"D",tp:"Probability Rules"},
+{t:"In probability, dependent events are associated with:",
+ o:["Non-replacement","Replacement","Classical probability only","Independent sampling"],a:"A",tp:"Probability Rules"},
+{t:"Conditional probability P(B/A) is the probability of event B occurring:",
+ o:["Before event A","Given that event A has already taken place","After neither A nor B has occurred","Independently of A"],a:"B",tp:"Probability Rules"},
+// ── BINOMIAL DISTRIBUTION ────────────────────────────────────
+{t:"The Binomial distribution is best applied when the probability of success is:",
+ o:["Very low","Zero","Very high","Always 0.5"],a:"C",tp:"Binomial Distribution"},
+{t:"In Binomial distribution, the formula b(x; n, p) equals:",
+ o:["C(n,x) · p^x · (1-p)^(n-x)","C(n,x) · p^n · (1-x)^(n-p)","n! · p^x · q^x","x! · p^x · (1-p)"],a:"A",tp:"Binomial Distribution"},
+{t:"In the Binomial formula, 'n' represents:",
+ o:["Probability of success","Number of successes","Standard deviation","Total number of trials"],a:"D",tp:"Binomial Distribution"},
+{t:"In the Binomial formula, 'x' represents:",
+ o:["Number of trials","Standard deviation","Number of successes in an individual trial","Mean"],a:"C",tp:"Binomial Distribution"},
+{t:"In the Binomial formula, 'p' represents:",
+ o:["Number of trials","Probability of success in an individual trial","Mean of distribution","Standard deviation"],a:"B",tp:"Binomial Distribution"},
+{t:"The mean (μ) of a Binomial distribution equals:",
+ o:["np","np²","n/p","√(npq)"],a:"A",tp:"Binomial Distribution"},
+{t:"The variance of a Binomial distribution equals:",
+ o:["np","np²","√(npq)","npq"],a:"D",tp:"Binomial Distribution"},
+{t:"The standard deviation of a Binomial distribution equals:",
+ o:["npq","np","√(npq)","√(np)"],a:"C",tp:"Binomial Distribution"},
+{t:"A coin is tossed 10 times. For x=6 heads, the combination coefficient used is:",
+ o:["6C10","10C6","10C4","5C10"],a:"B",tp:"Binomial Distribution"},
+// ── POISSON DISTRIBUTION ─────────────────────────────────────
+{t:"Poisson distribution is most appropriate when:",
+ o:["n is very large and the probability of success is very low","n is small and p is high","n and p are both exactly 0.5","n is always exactly 50"],a:"A",tp:"Poisson Distribution"},
+{t:"The Poisson distribution formula P(x; μ) equals:",
+ o:["(μ^x · e^x) / n!","μ^x / (x! · e^μ)","n! · p^x · q^(n-x)","(e^-μ · μ^x) / x!"],a:"D",tp:"Poisson Distribution"},
+{t:"In the Poisson formula, the mathematical constant 'e' equals approximately:",
+ o:["3.14159","2.71828","1.41421","1.61803"],a:"B",tp:"Poisson Distribution"},
+{t:"In a Poisson distribution, μ represents:",
+ o:["The variance","The sample size","The mean of the population","The standard deviation"],a:"C",tp:"Poisson Distribution"},
+{t:"The mean of a Poisson distribution equals:",
+ o:["np","np²","√(np)","n/p"],a:"A",tp:"Poisson Distribution"},
+{t:"The variance of a Poisson distribution equals:",
+ o:["np²","npq","n²p","np"],a:"D",tp:"Poisson Distribution"},
+{t:"A company sells an average of 2 homes per day. To find the probability of exactly 3 sales tomorrow, one uses:",
+ o:["Binomial distribution","Poisson distribution","Normal distribution","Hypergeometric distribution"],a:"B",tp:"Poisson Distribution"},
+{t:"For a Poisson distribution with μ=2, P(x=3) is approximately:",
+ o:["0.050","0.271","0.180","0.135"],a:"C",tp:"Poisson Distribution"},
+// ── HYPERGEOMETRIC DISTRIBUTION ──────────────────────────────
+{t:"The Hypergeometric distribution applies when sampling is done:",
+ o:["Without replacement from a finite population","With replacement from a large population","Using stratified methods only","With binomial probability"],a:"A",tp:"Hypergeometric Distribution"},
+{t:"In the Hypergeometric distribution, 'N' represents:",
+ o:["Number of successes in sample","Sample size","Number of failures","Population size"],a:"D",tp:"Hypergeometric Distribution"},
+{t:"In the Hypergeometric distribution, 'K' represents:",
+ o:["Sample size","Population size","Number of successes picked from the population","Number of failures"],a:"C",tp:"Hypergeometric Distribution"},
+{t:"In the Hypergeometric distribution, 'n' represents:",
+ o:["Population size","Sample size","Number of successes in population","Number of failures"],a:"B",tp:"Hypergeometric Distribution"},
+{t:"Selecting 5 cards from a deck of 52 without replacement is analyzed using:",
+ o:["Hypergeometric distribution","Poisson distribution","Normal distribution","Binomial distribution"],a:"A",tp:"Hypergeometric Distribution"},
+// ── NORMAL DISTRIBUTION ──────────────────────────────────────
+{t:"In Normal distribution, the Z-score formula is:",
+ o:["Z = (μ - x) / σ","Z = σ / (x - μ)","Z = (x + μ) × σ","Z = (x - μ) / σ"],a:"D",tp:"Normal Distribution"},
+{t:"In the Z-score formula, the symbol μ represents the:",
+ o:["Standard deviation","Sample size","Mean of the population","Variance"],a:"C",tp:"Normal Distribution"},
+{t:"In the Z-score formula, the symbol σ represents the:",
+ o:["Population mean","Standard deviation of population","Sample size","Variance"],a:"B",tp:"Normal Distribution"},
+{t:"The Normal distribution curve is best described as:",
+ o:["Symmetrical and bell-shaped","Skewed to the right","Rectangular","Skewed to the left"],a:"A",tp:"Normal Distribution"},
+{t:"For a one-tail Normal distribution test, the Z-table answer must be:",
+ o:["Not subtracted from 0.5","Added to 0.5","Multiplied by 2","Subtracted from 0.5"],a:"D",tp:"Normal Distribution"},
+{t:"For a two-tail Normal distribution test, the Z-table answer is:",
+ o:["Subtracted from 0.5","Not subtracted from 0.5","Added to 0.5","Divided by 2"],a:"B",tp:"Normal Distribution"},
+{t:"The total area under a Normal distribution curve equals:",
+ o:["0","0.5","1","2"],a:"C",tp:"Normal Distribution"},
+{t:"The Normal distribution is symmetric about:",
+ o:["The mean μ","The variance","The Z-score","The standard deviation"],a:"A",tp:"Normal Distribution"},
+// ── CHI-SQUARE TEST ──────────────────────────────────────────
+{t:"The Chi-Square test (χ²) is classified as a:",
+ o:["Parametric test","T-test","Z-test","Non-parametric test based on observation"],a:"D",tp:"Chi-Square Test"},
+{t:"The Chi-Square formula χ² equals:",
+ o:["Σ(O + E) / E","Σ(O - E) / E²","Σ[(O - E)² / E]","Σ(O × E)² / n"],a:"C",tp:"Chi-Square Test"},
+{t:"In the Chi-Square formula, 'O' stands for:",
+ o:["Overall mean","Observed frequency","Outlier count","Optimal value"],a:"B",tp:"Chi-Square Test"},
+{t:"In the Chi-Square formula, 'E' stands for:",
+ o:["Expected frequency","Error value","Estimated mean","Empirical count"],a:"A",tp:"Chi-Square Test"},
+{t:"Degrees of freedom for a Chi-Square test based on a single sample equals:",
+ o:["n","n + 1","n × 2","n - 1"],a:"D",tp:"Chi-Square Test"},
+{t:"For a contingency table, the degrees of freedom is:",
+ o:["rows × columns","(rows + columns) - 1","(rows - 1) × (columns - 1)","rows / columns"],a:"C",tp:"Chi-Square Test"},
+// ── MEASURES OF ASSOCIATION ──────────────────────────────────
+{t:"Measures of Association studies:",
+ o:["Single variable analysis only","The relationship between two or more variables","Standard deviation only","Regression only"],a:"B",tp:"Correlation & Regression"},
+{t:"A positive association means that when variable X increases, variable Y:",
+ o:["Also increases","Decreases","Stays the same","Becomes zero"],a:"A",tp:"Correlation & Regression"},
+{t:"A negative association means that when variable X increases, variable Y:",
+ o:["Also increases","Stays the same","Decreases","Becomes unpredictable"],a:"C",tp:"Correlation & Regression"},
+{t:"Karl Pearson's Product-Moment Correlation Coefficient is denoted by:",
+ o:["μ","σ","χ","r"],a:"D",tp:"Correlation & Regression"},
+{t:"The Pearson correlation coefficient r measures:",
+ o:["The mean of the data","The strength and direction of a linear relationship","The variance of the population","The frequency of events"],a:"B",tp:"Correlation & Regression"},
+{t:"The formula for Pearson's r = Covariance(x,y) divided by:",
+ o:["σx · σy","Mean(x) × Mean(y)","σx + σy","σx² × σy²"],a:"A",tp:"Correlation & Regression"},
+// ── LINEAR REGRESSION ────────────────────────────────────────
+{t:"Linear regression is primarily used for:",
+ o:["Measuring variance","Calculating standard deviation","Predicting the dependent variable Y","Finding the population mean"],a:"C",tp:"Correlation & Regression"},
+{t:"The linear regression equation is written as:",
+ o:["y = ax + b²","y = a - bx","y = a × b + x","y = a + bx"],a:"D",tp:"Correlation & Regression"},
+{t:"In the regression equation y = a + bx, 'a' and 'b' are:",
+ o:["Variables","Constants","Probabilities","Frequencies"],a:"B",tp:"Correlation & Regression"},
+{t:"In the regression equation y = a + bx, the variable 'x' is:",
+ o:["The independent variable","The constant","The dependent variable","The mean"],a:"A",tp:"Correlation & Regression"},
+// ── SAMPLING DISTRIBUTION ────────────────────────────────────
+{t:"A Sampling Distribution is the distribution of a statistic that is:",
+ o:["Fixed for the population","Always equal to the population mean","Only used once","Repeatedly drawn from the population"],a:"D",tp:"Sampling Distribution"},
+{t:"A parameter is a quantity that measures or describes:",
+ o:["The sample","The confidence level","The population we want to study","The standard error"],a:"C",tp:"Sampling Distribution"},
+{t:"A statistic is a portion or part of:",
+ o:["The population","The sample","The confidence interval","The Z-table"],a:"B",tp:"Sampling Distribution"},
+{t:"The Central Limit Theorem states distributions approximate normality when n ≥:",
+ o:["30","10","20","50"],a:"A",tp:"Sampling Distribution"},
+{t:"The standard error of the sampling distribution of means equals:",
+ o:["σ × n","σ² / n","√n / σ","σ / √n"],a:"D",tp:"Sampling Distribution"},
+{t:"The mean of the sampling distribution of sample means (μx̄) equals:",
+ o:["σ","μ/n","μ","√n"],a:"C",tp:"Sampling Distribution"},
+{t:"The variance of the sampling distribution of means equals:",
+ o:["σ/√n","σ²/n","√σ/n","n/σ²"],a:"B",tp:"Sampling Distribution"},
+{t:"The standard deviation of the sampling distribution of proportions is:",
+ o:["√(π(1-π)/n)","π × n","π² / n","√(n/π)"],a:"A",tp:"Sampling Distribution"},
+// ── TYPES OF SAMPLING ────────────────────────────────────────
+{t:"In Random Sampling, every member of the population has:",
+ o:["No chance of selection","A reduced chance","A chance based on size","An equal chance to be selected"],a:"D",tp:"Types of Sampling"},
+{t:"Stratified sampling divides the population into:",
+ o:["A single group","Clusters already in existence","Two or more groups (strata)","Pre-determined intervals"],a:"C",tp:"Types of Sampling"},
+{t:"An advantage of Stratified Sampling is that samples are usually:",
+ o:["Cheaper to collect","More representative of the population","Unrepresentative","Used only for small populations"],a:"B",tp:"Types of Sampling"},
+{t:"In Cluster Sampling, natural groups existing in the population are called:",
+ o:["Clusters","Strata","Batches","Frames"],a:"A",tp:"Types of Sampling"},
+{t:"A disadvantage of Cluster Sampling is:",
+ o:["It is always representative","It has no degrees of freedom","The cluster values may be difficult to locate","Too many samples are required"],a:"C",tp:"Types of Sampling"},
+{t:"In Systematic Sampling, elements are selected from the population frame at:",
+ o:["Random positions","The end only","The beginning only","A pre-determined interval"],a:"D",tp:"Types of Sampling"},
+// ── STATISTICAL INFERENCE ────────────────────────────────────
+{t:"Descriptive Statistics summarizes data using:",
+ o:["Only regression analysis","Graphs, means, and interquartile values","Hypothesis testing only","Sampling distributions only"],a:"B",tp:"Statistical Inference"},
+{t:"Inferential Statistics helps us to:",
+ o:["Draw conclusions beyond the data from the population","Only describe the data","Count data entries","Plot scatter diagrams only"],a:"A",tp:"Statistical Inference"},
+{t:"A Sample is defined as:",
+ o:["The entire collection of individuals","A statistical test","A confidence interval","A subset of the population selected for study"],a:"D",tp:"Statistical Inference"},
+{t:"A Population is defined as:",
+ o:["A subset selected for study","Only the people in a country","The entire collection of individuals or objects under study","A confidence interval"],a:"C",tp:"Statistical Inference"},
+// ── CONFIDENCE INTERVALS ─────────────────────────────────────
+{t:"A point estimate is a single value used to represent a:",
+ o:["Confidence interval","Population characteristic","Sample mean only","Standard deviation"],a:"B",tp:"Confidence Intervals"},
+{t:"A Confidence Interval is of the general form:",
+ o:["x̄ ± Margin of Error","x̄ - Mean","Z × σ","n × p"],a:"A",tp:"Confidence Intervals"},
+{t:"The confidence interval formula for population mean (with known σ) is:",
+ o:["n ± Zα","μ ± σ","x̄ ± t × s","x̄ ± Zα/2 × (σ/√n)"],a:"D",tp:"Confidence Intervals"},
+{t:"The most commonly used confidence level in practice is:",
+ o:["90%","99%","95%","50%"],a:"C",tp:"Confidence Intervals"},
+{t:"For a 95% confidence interval, the significance level α equals:",
+ o:["0.95","0.05","0.025","0.10"],a:"B",tp:"Confidence Intervals"},
+{t:"For a 95% confidence interval, α/2 equals:",
+ o:["0.025","0.05","0.95","0.975"],a:"A",tp:"Confidence Intervals"},
+{t:"The Z-value for a 95% confidence interval (two-tailed) is:",
+ o:["1.645","2.326","2.576","1.96"],a:"D",tp:"Confidence Intervals"},
+{t:"The Z-value for a 90% confidence interval is approximately:",
+ o:["1.96","2.58","1.645","2.33"],a:"C",tp:"Confidence Intervals"},
+{t:"The Z-value for a 99% confidence interval is approximately:",
+ o:["1.96","2.576","1.645","2.326"],a:"B",tp:"Confidence Intervals"},
+// ── T-DISTRIBUTION ───────────────────────────────────────────
+{t:"When population standard deviation σ is unknown, the appropriate distribution is:",
+ o:["T-distribution","Z-distribution","Chi-square test","Binomial formula"],a:"A",tp:"T-Distribution"},
+{t:"The T-distribution is most appropriate when:",
+ o:["n ≥ 30 and σ is known","n is exactly 100","n is always 50","n < 30 and σ is unknown"],a:"D",tp:"T-Distribution"},
+{t:"Degrees of freedom (df) for the T-distribution is:",
+ o:["n","n + 1","n - 1","2n"],a:"C",tp:"T-Distribution"},
+{t:"The T-test statistic formula is:",
+ o:["t = (μ - x̄) / σ","t = (x̄ - μ) / (s/√n)","t = Z × σ / n","t = s / (x̄ - μ)"],a:"B",tp:"T-Distribution"},
+// ── HYPOTHESIS TESTING ───────────────────────────────────────
+{t:"The Null Hypothesis (H₀) is:",
+ o:["The statement or claim to be tested","Always rejected","Equal to the confidence interval","The alternative claim"],a:"A",tp:"Hypothesis Testing"},
+{t:"The Alternative Hypothesis (Hₐ) is:",
+ o:["Always accepted","The null hypothesis","Equal to the null","The hypothesis against the null hypothesis"],a:"D",tp:"Hypothesis Testing"},
+{t:"When σ is unknown in hypothesis testing, we use:",
+ o:["Z-table","Chi-square table","T-table","Normal distribution table only"],a:"C",tp:"Hypothesis Testing"},
+{t:"A one-tailed test is appropriate when the alternative hypothesis is:",
+ o:["≠ (not equal to)","Directional (< or >)","= (equal to)","≤ or ≥"],a:"B",tp:"Hypothesis Testing"},
+{t:"A two-tailed test is appropriate when the alternative hypothesis uses:",
+ o:["≠ (not equal to)","< (less than)","> (greater than)","≤ (less than or equal)"],a:"A",tp:"Hypothesis Testing"},
+{t:"The significance level α represents:",
+ o:["The confidence level","Accepting the alternative always","Correctly accepting H₀","The probability of rejecting a true null hypothesis"],a:"D",tp:"Hypothesis Testing"},
+// ── ESTIMATION & PROPERTIES ──────────────────────────────────
+{t:"An unbiased statistic is one whose:",
+ o:["Value is always zero","Standard deviation is maximum","Its mean value equals the population characteristic being estimated","Its value varies randomly"],a:"C",tp:"Estimation"},
+{t:"Among several unbiased statistics, the best one to use has the:",
+ o:["Largest standard deviation","Smallest standard deviation","Highest mean","Greatest variance"],a:"B",tp:"Estimation"},
+{t:"A 'large sample' in statistics is defined as having:",
+ o:["n ≥ 30","n ≥ 10","n ≥ 20","n ≥ 50"],a:"A",tp:"Estimation"},
+{t:"The sample proportion p̂ represents:",
+ o:["The entire population's proportion","The standard error","The confidence interval","The fraction of individuals in a sample having a characteristic"],a:"D",tp:"Estimation"},
+{t:"The standard error of sample proportions equals:",
+ o:["p × n","p² / n","√(p(1-p)/n)","n × p × q"],a:"C",tp:"Estimation"},
+{t:"The sampling distribution of p̂ is centered at:",
+ o:["0","The population proportion p","1","The sample mean x̄"],a:"B",tp:"Estimation"},
+{t:"Population variance σ² is calculated as:",
+ o:["Σ(x - x̄)² / n","Σx / n","n × p × q","√(Σ(x-x̄)²/n)"],a:"A",tp:"Estimation"},
+{t:"The standard deviation of a sample equals:",
+ o:["Variance²","n × p","Σx/n","√(Variance)"],a:"D",tp:"Estimation"},
+// ── ADVANCED INFERENCE ───────────────────────────────────────
+{t:"Analysis of Variance (ANOVA) is primarily used to compare:",
+ o:["Standard deviations only","Proportions only","Means of multiple groups","Regression coefficients only"],a:"C",tp:"ANOVA & Advanced"},
+{t:"As sample size increases, the T-distribution curve approaches:",
+ o:["Chi-square distribution","Normal distribution","Uniform distribution","Binomial distribution"],a:"B",tp:"ANOVA & Advanced"},
+{t:"The mean of the sampling distribution of means μx̄ = μ, meaning the sample mean is:",
+ o:["An unbiased estimator of the population mean","Always biased","An overestimate of μ","An underestimate of μ"],a:"A",tp:"ANOVA & Advanced"},
+{t:"As sample size N increases, the spread (S.D.) of the sampling distribution will:",
+ o:["Increase","Stay the same","Become 1","Decrease"],a:"D",tp:"ANOVA & Advanced"},
+{t:"If sampling is from a normally distributed population, the sampling distribution will:",
+ o:["Always be skewed","Be uniform","Also be normally distributed","Be binomial"],a:"C",tp:"ANOVA & Advanced"},
+{t:"The Z-score formula for the sampling distribution of means is:",
+ o:["Z = (μ - x̄) × √n / σ","Z = (x̄ - μ) / (σ/√n)","Z = (x̄ - μ) × n / σ","Z = σ / (x̄ - μ)"],a:"B",tp:"ANOVA & Advanced"},
+{t:"The confidence interval formula for population proportion is:",
+ o:["p̂ ± Zα/2 × √(p̂(1-p̂)/n)","p̂ ± t × s/√n","p̂ ± σ/√n","p̂ ± Zα/2 × σ"],a:"A",tp:"ANOVA & Advanced"},
+{t:"A confidence interval shows how closely the sample mean is related to the:",
+ o:["Standard deviation","Variance","Z-score","Population mean"],a:"D",tp:"ANOVA & Advanced"},
+{t:"A scatter diagram where points show no clear pattern indicates:",
+ o:["Strong positive correlation","Strong negative correlation","No correlation (r ≈ 0)","Perfect correlation"],a:"C",tp:"Correlation & Regression"},
+{t:"For two independent events A and B, P(A and B) =",
+ o:["P(A) + P(B)","P(A) × P(B)","P(A) − P(B)","P(A) / P(B)"],a:"B",tp:"Probability Rules"},
+{t:"The textbook for ABE 302 Engineering Statistics is authored by:",
+ o:["Roxy Peck & Joy Dover (Schaum's Series)","Karl Pearson & Fisher","Montgomery & Runger","Walpole & Myers"],a:"A",tp:"Course Info"}
+];
+
+/* ════════════════ STATE ════════════════ */
+const L=['A','B','C','D'];
+let numQ=20,tlim=30,mode='random',batchSt=0;
+let quiz=[],cur=0,ans={},flagged=new Set(),tsec=0,tint=null,rCur=0;
+
+/* ════════════════ SETUP ════════════════ */
+function init(){
+  setupChips('qChips',[10,20,30,50,100,120],numQ,v=>{numQ=v;batchSt=0;if(mode==='order')renderBatch()});
+  setupChips('tChips',[10,15,30,45,60,90],tlim,v=>{tlim=v},true);
+}
+
+function setupChips(id,vals,def,cb,mins=false){
+  const c=document.getElementById(id);c.innerHTML='';
+  vals.forEach(v=>{
+    const b=document.createElement('button');b.className='chip'+(v===def?' on':'');
+    b.textContent=mins?v+'m':v;
+    b.onclick=()=>{document.querySelectorAll('#'+id+' .chip').forEach(x=>x.classList.remove('on'));b.classList.add('on');cb(v)};
+    c.appendChild(b);
+  });
+}
+
+function setMode(m){
+  mode=m;
+  document.getElementById('mRand').classList.toggle('on',m==='random');
+  document.getElementById('mOrd').classList.toggle('on',m==='order');
+  document.getElementById('batchCard').style.display=m==='order'?'block':'none';
+  if(m==='order')renderBatch();
+}
+
+function renderBatch(){
+  const c=document.getElementById('batchChips');c.innerHTML='';
+  for(let s=0;s<Q.length;s+=numQ){
+    const e=Math.min(s+numQ,Q.length),ss=s;
+    const b=document.createElement('button');b.className='chip'+(s===batchSt?' on':'');
+    b.textContent='Q'+(s+1)+'–'+e;
+    b.onclick=()=>{batchSt=ss;document.querySelectorAll('#batchChips .chip').forEach(x=>x.classList.remove('on'));b.classList.add('on')};
+    c.appendChild(b);
+  }
+}
+
+/* ════════════════ QUIZ ════════════════ */
+function shuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;}
+
+function startQuiz(){
+  quiz=mode==='order'?Q.slice(batchSt,batchSt+numQ):shuffle(Q).slice(0,numQ);
+  ans={};flagged=new Set();cur=0;tsec=tlim*60;
+  show('quiz');startTimer();renderQ();
+}
+
+function startTimer(){
+  clearInterval(tint);updateTimer();
+  tint=setInterval(()=>{tsec--;updateTimer();if(tsec<=0){clearInterval(tint);doSubmit();}},1000);
+}
+
+function updateTimer(){
+  const el=document.getElementById('timer');
+  el.textContent=String(Math.floor(tsec/60)).padStart(2,'0')+':'+String(tsec%60).padStart(2,'0');
+  el.style.color=tsec<60?'var(--err)':tsec<300?'var(--warn)':'var(--ok)';
+}
+
+function renderQ(){
+  const q=quiz[cur];
+  const done=Object.keys(ans).length;
+  const suf=mode==='order'?' (Q'+(batchSt+1)+'–'+Math.min(batchSt+numQ,Q.length)+')':'';
+  document.getElementById('qDone').textContent=done+'/'+quiz.length+' done'+suf;
+  document.getElementById('qNum').textContent='Q '+(cur+1)+' OF '+quiz.length;
+  document.getElementById('qText').textContent=q.t;
+  document.getElementById('progFill').style.width=((cur+1)/quiz.length*100)+'%';
+
+  const fb=document.getElementById('flagBtn');const fl=flagged.has(cur);
+  fb.textContent=fl?'⚑ FLAGGED':'⚐ FLAG';fb.className='flag-btn'+(fl?' flagged':'');
+
+  const oc=document.getElementById('opts');oc.innerHTML='';
+  q.o.forEach((opt,i)=>{
+    const lt=L[i],sel=ans[cur]===lt;
+    const btn=document.createElement('button');btn.className='opt'+(sel?' sel':'');
+    btn.innerHTML=`<span class="opt-l">${lt}.</span><span>${opt}</span>`;
+    btn.onclick=()=>pickAns(lt);oc.appendChild(btn);
+  });
+
+  document.getElementById('prevBtn').disabled=cur===0;
+  document.getElementById('nextBtn').disabled=cur===quiz.length-1;
+  renderGrid();
+}
+
+function renderGrid(){
+  const g=document.getElementById('grid');g.innerHTML='';
+  quiz.forEach((_,i)=>{
+    const b=document.createElement('button');
+    b.className='gb'+(i===cur?' cur':flagged.has(i)?' flg':ans[i]?' ans':'');
+    b.textContent=i+1;b.onclick=()=>{cur=i;renderQ();};g.appendChild(b);
+  });
+}
+
+function pickAns(lt){ans[cur]=lt;renderQ();}
+function toggleFlag(){flagged.has(cur)?flagged.delete(cur):flagged.add(cur);renderQ();}
+function nav(d){cur=Math.max(0,Math.min(quiz.length-1,cur+d));renderQ();}
+
+function confirmSubmit(){
+  const un=quiz.length-Object.keys(ans).length;
+  if(un>0){if(!confirm('You have '+un+' unanswered question(s). Submit anyway?'))return;}
+  else{if(!confirm('Submit exam? You can review afterwards.'))return;}
+  doSubmit();
+}
+
+function doSubmit(){
+  clearInterval(tint);
+  const score=quiz.reduce((s,q,i)=>s+(ans[i]===q.a?1:0),0);
+  const tot=quiz.length,pct=Math.round(score/tot*100),pass=pct>=50;
+  document.getElementById('bigPct').textContent=pct+'%';
+  document.getElementById('bigPct').style.color=pass?'var(--ok)':'var(--err)';
+  document.getElementById('gradeLabel').textContent=pass?'PASS':'FAIL';
+  document.getElementById('gradeLabel').style.color=pass?'var(--ok)':'var(--err)';
+  const un=tot-Object.keys(ans).length;
+  document.getElementById('statsCard').innerHTML=`
+    <div class="srow"><span class="slbl">CORRECT</span><span class="sval" style="color:var(--ok)">${score}</span></div>
+    <div class="srow"><span class="slbl">WRONG</span><span class="sval" style="color:var(--err)">${tot-score}</span></div>
+    <div class="srow"><span class="slbl">UNANSWERED</span><span class="sval" style="color:var(--warn)">${un}</span></div>
+    <div class="srow"><span class="slbl">TOTAL QUESTIONS</span><span class="sval" style="color:var(--muted)">${tot}</span></div>
+    <div class="srow" style="border:none"><span class="slbl">PASS THRESHOLD</span><span class="sval" style="color:var(--muted)">50%</span></div>`;
+  show('results');
+}
+
+/* ════════════════ REVIEW ════════════════ */
+function goReview(){rCur=0;renderRev();show('review');}
+
+function renderRev(){
+  const q=quiz[rCur];const ua=ans[rCur];const ca=q.a;const ok=ua===ca;
+  document.getElementById('rNum').textContent='Q '+(rCur+1)+' OF '+quiz.length;
+  document.getElementById('rTopic').textContent=q.tp||'';
+  document.getElementById('rText').textContent=q.t;
+  document.getElementById('rvVerdict').textContent=ok?'✓ CORRECT':'✗ WRONG';
+  document.getElementById('rvVerdict').style.color=ok?'var(--ok)':'var(--err)';
+
+  const rc=document.getElementById('rOpts');rc.innerHTML='';
+  q.o.forEach((opt,i)=>{
+    const lt=L[i];const isC=lt===ca,isU=lt===ua&&!isC;
+    const d=document.createElement('div');
+    d.className='opt'+(isC?' cor':isU?' wrg':'');
+    d.innerHTML=`<span class="opt-l">${lt}.</span><span style="flex:1">${opt}</span>${isC?'<span class="opt-ico" style="color:var(--ok)">✓</span>':isU?'<span class="opt-ico" style="color:var(--err)">✗</span>':''}`;
+    rc.appendChild(d);
+  });
+
+  const correctText=q.o[L.indexOf(ca)];
+  const note=document.getElementById('rvNote');
+  if(!ua){note.innerHTML=`<b>Not answered.</b> Correct answer: <b>${ca} — ${correctText}</b>`;}
+  else if(ok){note.innerHTML=`<b>Correct!</b> Answer: <b>${ca} — ${correctText}</b>  |  Topic: ${q.tp||'—'}`;}
+  else{note.innerHTML=`<b>Incorrect.</b> You chose <b>${ua}</b>. Correct: <b>${ca} — ${correctText}</b>  |  Topic: ${q.tp||'—'}`;}
+
+  document.getElementById('rPrev').disabled=rCur===0;
+  document.getElementById('rNext').disabled=rCur===quiz.length-1;
+  renderRGrid();
+}
+
+function renderRGrid(){
+  const g=document.getElementById('rGrid');g.innerHTML='';
+  quiz.forEach((_,i)=>{
+    const b=document.createElement('button');const ok=ans[i]===quiz[i].a;
+    b.className='gb'+(i===rCur?' cur':'');
+    b.style.background=i===rCur?'var(--acc)':ok?'var(--ok)':ans[i]?'var(--err)':'var(--surf)';
+    b.style.color=i===rCur||ok||ans[i]?'#fff':'var(--muted)';
+    b.textContent=i+1;b.onclick=()=>{rCur=i;renderRev();};g.appendChild(b);
+  });
+}
+
+function rNav(d){rCur=Math.max(0,Math.min(quiz.length-1,rCur+d));renderRev();}
+function goHome(){show('home');}
+function show(id){
+  ['home','quiz','results','review'].forEach(s=>{
+    const el=document.getElementById(s);
+    el.style.display=s===id?(s==='results'?'flex':'block'):'none';
+  });
+}
+
+init();
+</script>
+</body>
+</html>
